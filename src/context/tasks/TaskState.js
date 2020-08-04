@@ -1,71 +1,94 @@
 import React, { useReducer } from "react";
+import { notification } from "antd";
 import TaskContext from "./TaskContext";
 import TaskReducer from "./TaskReducer";
-import {
-  PROJECT_TASKS,
-  ADD_TASK,
-  UPDATE_TASK,
-  COMPLETED_TASK,
-  DELETE_TASK,
-} from "../../types";
+import { PROJECT_TASKS, ADD_TASK, UPDATE_TASK, DELETE_TASK } from "../../types";
+import clientAxios from "../../config/axios";
 
 const TaskState = (props) => {
   const initialState = {
-    tasks: [
-      { id: 1, name: "Task 1", completed: true, projectId: 1 },
-      { id: 2, name: "Task 2", completed: false, projectId: 1 },
-      { id: 3, name: "Task 3", completed: false, projectId: 2 },
-      { id: 4, name: "Task 4", completed: true, projectId: 3 },
-    ],
-    projectTasks: null,
+    projectTasks: [],
   };
 
   const [state, dispatch] = useReducer(TaskReducer, initialState);
 
-  const getTasks = (projectId) => {
-    dispatch({
-      type: PROJECT_TASKS,
-      payload: projectId,
-    });
+  const getTasks = async (projectId) => {
+    try {
+      const result = await clientAxios.get("/api/tasks", {
+        params: { project: projectId },
+      });
+
+      dispatch({
+        type: PROJECT_TASKS,
+        payload: result.data.tasks,
+      });
+    } catch (error) {
+      notification.error({
+        message: "Error",
+        description: "Could not fetch tasks.",
+      });
+    }
   };
 
-  const addTask = (task) => {
-    dispatch({
-      type: ADD_TASK,
-      payload: task,
-    });
+  const addTask = async (task) => {
+    try {
+      const result = await clientAxios.post("/api/tasks", task);
+
+      dispatch({
+        type: ADD_TASK,
+        payload: result.data.task,
+      });
+    } catch (error) {
+      notification.error({
+        message: "Error",
+        description: "The task could not be added.",
+      });
+    }
   };
 
-  const updateTask = (task) => {
-    dispatch({
-      type: UPDATE_TASK,
-      payload: task,
-    });
+  const updateTask = async (task) => {
+    try {
+      const result = await clientAxios.put(`/api/tasks/${task._id}`, task);
+
+      dispatch({
+        type: UPDATE_TASK,
+        payload: result.data.task,
+      });
+    } catch (error) {
+      notification.error({
+        message: "Error",
+        description: "The task could not be updated.",
+      });
+    }
   };
 
-  const toggleCompletedTask = (task) => {
-    dispatch({
-      type: COMPLETED_TASK,
-      payload: task,
-    });
-  };
+  const deleteTask = async (taskId, projectId) => {
+    try {
+      await clientAxios.delete(`/api/tasks/${taskId}`, {
+        params: {
+          project: projectId,
+        },
+      });
 
-  const deleteTask = (taskId) => {
-    dispatch({
-      type: DELETE_TASK,
-      payload: taskId,
-    });
+      dispatch({
+        type: DELETE_TASK,
+        payload: taskId,
+      });
+    } catch (error) {
+      notification.error({
+        message: "Error",
+        description: "The task could not be removed.",
+      });
+    }
   };
 
   return (
     <TaskContext.Provider
       value={{
-        tasks: state.tasks,
         projectTasks: state.projectTasks,
         getTasks,
         addTask,
         updateTask,
-        toggleCompletedTask,
         deleteTask,
       }}
     >

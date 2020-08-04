@@ -1,40 +1,33 @@
-import {
-  PROJECT_TASKS,
-  ADD_TASK,
-  UPDATE_TASK,
-  COMPLETED_TASK,
-  DELETE_TASK,
-} from "../../types";
+import { PROJECT_TASKS, ADD_TASK, UPDATE_TASK, DELETE_TASK } from "../../types";
 
 export default (state, action) => {
   switch (action.type) {
     case PROJECT_TASKS:
       return {
         ...state,
-        projectTasks: state.tasks.filter(
-          (task) => task.projectId === action.payload
-        ),
+        projectTasks: action.payload,
       };
 
     case ADD_TASK:
       return {
         ...state,
-        tasks: [...state.tasks, action.payload],
+        projectTasks: [...state.projectTasks, action.payload],
       };
 
     case UPDATE_TASK:
-    case COMPLETED_TASK:
       return {
         ...state,
-        tasks: state.tasks.filter((task) =>
-          task.id === action.payload.id ? action.payload : task
+        projectTasks: state.projectTasks.filter((task) =>
+          task._id === action.payload._id ? action.payload : task
         ),
       };
 
     case DELETE_TASK:
       return {
         ...state,
-        tasks: state.tasks.filter((task) => task.id !== action.payload),
+        projectTasks: state.projectTasks.filter(
+          (task) => task._id !== action.payload
+        ),
       };
 
     default:

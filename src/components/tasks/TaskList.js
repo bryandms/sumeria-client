@@ -12,7 +12,7 @@ const TaskList = () => {
       itemLayout="horizontal"
       locale={{ emptyText: <Empty description="No tasks registered" /> }}
       dataSource={projectTasks}
-      renderItem={(item) => <Task key={item.id} task={item} />}
+      renderItem={(item) => <Task key={item._id} task={item} />}
     />
   );
 };

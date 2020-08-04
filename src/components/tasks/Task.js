@@ -7,21 +7,19 @@ import TaskContext from "../../context/tasks/TaskContext";
 const { Text } = Typography;
 
 const Task = ({ task }) => {
-  const { id, name, completed } = task;
+  const { _id, name, completed } = task;
   const { selectedProject } = useContext(ProjectContext);
-  const { getTasks, updateTask, toggleCompletedTask, deleteTask } = useContext(
-    TaskContext
-  );
+  const { getTasks, updateTask, deleteTask } = useContext(TaskContext);
   const [taskName, setTaskName] = useState(name);
 
   const handleDeleteTask = (id) => {
-    deleteTask(id);
+    deleteTask(id, selectedProject._id);
     getTasks(selectedProject._id);
   };
 
   const handleToggleCompletedTask = (task) => {
     task.completed = !task.completed;
-    toggleCompletedTask(task);
+    updateTask(task);
   };
 
   const handleChange = (value) => {
@@ -36,7 +34,7 @@ const Task = ({ task }) => {
   return (
     <List.Item
       className="px-3"
-      key={id}
+      key={_id}
       actions={[
         <Tag
           icon={completed ? <CheckCircleOutlined /> : <SyncOutlined spin />}
@@ -46,7 +44,7 @@ const Task = ({ task }) => {
           {completed ? "Completed" : "Pending"}
         </Tag>,
 
-        <a href="#!" onClick={() => handleDeleteTask(id)}>
+        <a href="#!" onClick={() => handleDeleteTask(_id)}>
           Delete
         </a>,
       ]}

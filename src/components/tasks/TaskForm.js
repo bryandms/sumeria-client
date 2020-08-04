@@ -17,14 +17,12 @@ const nameValidation = [
 
 const TaskForm = () => {
   const { selectedProject } = useContext(ProjectContext);
-  const { tasks, addTask, getTasks } = useContext(TaskContext);
+  const { addTask, getTasks } = useContext(TaskContext);
 
   const [form] = Form.useForm();
 
   const handleSubmit = (task) => {
-    task.id = tasks.length + 1;
-    task.projectId = selectedProject._id;
-    task.completed = false;
+    task.project = selectedProject._id;
     addTask(task);
 
     getTasks(selectedProject._id);
