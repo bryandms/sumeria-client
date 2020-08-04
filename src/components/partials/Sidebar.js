@@ -13,7 +13,7 @@ const Sidebar = ({ theme }) => {
 
   const handleSelectProject = (project) => {
     selectProject(project);
-    getTasks(project.id);
+    getTasks(project._id);
   };
 
   return (

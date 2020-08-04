@@ -1,4 +1,5 @@
 import React, { useReducer } from "react";
+import { notification } from "antd";
 import ProjectContext from "./ProjectContext";
 import ProjectReducer from "./ProjectReducer";
 import {
@@ -7,15 +8,9 @@ import {
   SELECTED_PROJECT,
   DELETE_PROJECT,
 } from "../../types";
+import clientAxios from "../../config/axios";
 
 const ProjectState = (props) => {
-  const projects = [
-    { id: 1, name: "Project 1" },
-    { id: 2, name: "Project 2" },
-    { id: 3, name: "Project 3" },
-    { id: 4, name: "Project 4" },
-  ];
-
   const initialState = {
     projects: [],
     selectedProject: null,
@@ -23,20 +18,36 @@ const ProjectState = (props) => {
 
   const [state, dispatch] = useReducer(ProjectReducer, initialState);
 
-  const getProjects = () => {
-    dispatch({
-      type: GET_PROJECTS,
-      payload: projects,
-    });
+  const getProjects = async () => {
+    try {
+      const result = await clientAxios.get("/api/projects");
+
+      dispatch({
+        type: GET_PROJECTS,
+        payload: result.data.projects,
+      });
+    } catch (error) {
+      notification.error({
+        message: "Error",
+        description: "Could not fetch projects.",
+      });
+    }
   };
 
-  const addProject = (project) => {
-    project.id = state.projects.length + 1;
+  const addProject = async (project) => {
+    try {
+      const result = await clientAxios.post("/api/projects", project);
 
-    dispatch({
-      type: ADD_PROJECT,
-      payload: project,
-    });
+      dispatch({
+        type: ADD_PROJECT,
+        payload: result.data.project,
+      });
+    } catch (error) {
+      notification.error({
+        message: "Error",
+        description: "The project could not be added.",
+      });
+    }
   };
 
   const selectProject = (project) => {
@@ -46,11 +57,20 @@ const ProjectState = (props) => {
     });
   };
 
-  const deleteProject = (projectId) => {
-    dispatch({
-      type: DELETE_PROJECT,
-      payload: projectId,
-    });
+  const deleteProject = async (projectId) => {
+    try {
+      await clientAxios.delete(`/api/projects/${projectId}`);
+
+      dispatch({
+        type: DELETE_PROJECT,
+        payload: projectId,
+      });
+    } catch (error) {
+      notification.error({
+        message: "Error",
+        description: "The project could not be removed.",
+      });
+    }
   };
 
   return (

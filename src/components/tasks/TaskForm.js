@@ -23,11 +23,11 @@ const TaskForm = () => {
 
   const handleSubmit = (task) => {
     task.id = tasks.length + 1;
-    task.projectId = selectedProject.id;
+    task.projectId = selectedProject._id;
     task.completed = false;
     addTask(task);
 
-    getTasks(selectedProject.id);
+    getTasks(selectedProject._id);
     form.resetFields();
   };
 

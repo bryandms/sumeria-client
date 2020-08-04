@@ -30,7 +30,7 @@ export default (state, action) => {
         ...state,
         selectedProject: null,
         projects: state.projects.filter(
-          (project) => project.id !== action.payload
+          (project) => project._id !== action.payload
         ),
       };
 

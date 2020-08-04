@@ -17,7 +17,7 @@ const ProjectList = (props) => {
   return (
     <Menu.ItemGroup title="Projects" {...props}>
       {projects.map((project) => (
-        <Project key={project.id} project={project} {...props} />
+        <Project key={project._id} project={project} {...props} />
       ))}
     </Menu.ItemGroup>
   );

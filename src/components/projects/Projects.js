@@ -19,7 +19,7 @@ const Projects = () => {
   };
 
   const handleDeleteProject = () => {
-    deleteProject(selectedProject.id);
+    deleteProject(selectedProject._id);
   };
 
   return (

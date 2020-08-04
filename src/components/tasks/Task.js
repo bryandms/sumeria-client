@@ -16,7 +16,7 @@ const Task = ({ task }) => {
 
   const handleDeleteTask = (id) => {
     deleteTask(id);
-    getTasks(selectedProject.id);
+    getTasks(selectedProject._id);
   };
 
   const handleToggleCompletedTask = (task) => {
