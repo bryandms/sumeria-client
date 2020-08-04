@@ -12,10 +12,12 @@ const { Content } = Layout;
 const Projects = () => {
   const { selectedProject, deleteProject } = useContext(ProjectContext);
 
-  const [theme, setTheme] = useState("dark");
+  const [theme, setTheme] = useState(localStorage.getItem("theme") || "dark");
 
   const handleTheme = () => {
-    setTheme(theme === "light" ? "dark" : "light");
+    const themeChanged = theme === "light" ? "dark" : "light";
+    setTheme(themeChanged);
+    localStorage.setItem("theme", themeChanged);
   };
 
   const handleDeleteProject = () => {
