@@ -5,7 +5,20 @@ import "antd/dist/antd.css";
 import "./index.css";
 import * as serviceWorker from "./serviceWorker";
 
-ReactDOM.render(<App />, document.getElementById("root"));
+import AuthState from "./context/auth/AuthState";
+import ProjectState from "./context/projects/ProjectState";
+import TaskState from "./context/tasks/TaskState";
+
+ReactDOM.render(
+  <AuthState>
+    <ProjectState>
+      <TaskState>
+        <App />
+      </TaskState>
+    </ProjectState>
+  </AuthState>,
+  document.getElementById("root")
+);
 
 // If you want your app to work offline and load faster, you can change
 // unregister() to register() below. Note this comes with some pitfalls.

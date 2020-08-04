@@ -1,13 +1,25 @@
-import React from "react";
+import React, { useState, useContext } from "react";
 import { Link } from "react-router-dom";
-import { Row, Col, Form, Input, Button, Typography, Card, Divider } from "antd";
+import {
+  Row,
+  Col,
+  Form,
+  Input,
+  Button,
+  Typography,
+  Card,
+  Divider,
+  notification,
+} from "antd";
 import { UserOutlined, MailOutlined, LockOutlined } from "@ant-design/icons";
+import AuthContext from "../../context/auth/AuthContext";
+import clientAxios from "../../config/axios";
 
-const usernameValidation = [
-  { required: true, message: "Please input your username." },
+const nameValidation = [
+  { required: true, message: "Please input your name." },
   {
     whitespace: true,
-    message: "Please input a valid username.",
+    message: "Please input a valid name.",
   },
 ];
 const emailValidation = [
@@ -49,9 +61,49 @@ const confirmPassword = [
   }),
 ];
 
-const Register = () => {
+const Register = (props) => {
+  const [form] = Form.useForm();
+  const { setToken, setIsAuth } = useContext(AuthContext);
+  const [loading, setLoading] = useState(false);
+
   const handleSubmit = (values) => {
-    console.log("Received values of form: ", values);
+    setLoading(true);
+    clientAxios
+      .post("/api/users", values)
+      .then((response) => {
+        const remainingMilliseconds = 60 * 60 * 1000;
+        const expiryDate = new Date(
+          new Date().getTime() + remainingMilliseconds
+        );
+
+        setLoading(false);
+        setToken(response.data.token);
+        setIsAuth(true);
+        localStorage.setItem("token", response.data.token);
+        localStorage.setItem("expiryDate", expiryDate.toISOString());
+        props.setAutoLogout(remainingMilliseconds);
+
+        return props.history.push("/projects");
+      })
+      .catch((error) => {
+        setLoading(false);
+        if (error.response?.status === 422) {
+          form.setFields([
+            {
+              name: "email",
+              errors: [error.response.data.message],
+            },
+          ]);
+          return;
+        }
+
+        console.log(error.response);
+
+        notification.error({
+          message: "Error",
+          description: "Could not create user",
+        });
+      });
   };
 
   return (
@@ -60,13 +112,9 @@ const Register = () => {
         <Card className="shadow">
           <Typography.Title className="text-center">Register</Typography.Title>
 
-          <Form onFinish={handleSubmit} layout="vertical">
-            <Form.Item
-              name="username"
-              label="Username"
-              rules={usernameValidation}
-            >
-              <Input prefix={<UserOutlined />} placeholder="Username" />
+          <Form form={form} onFinish={handleSubmit} layout="vertical">
+            <Form.Item name="name" label="Name" rules={nameValidation}>
+              <Input prefix={<UserOutlined />} placeholder="Name" />
             </Form.Item>
 
             <Form.Item name="email" label="Email" rules={emailValidation}>
@@ -101,7 +149,13 @@ const Register = () => {
             </Form.Item>
 
             <Form.Item>
-              <Button className="mb-3" type="primary" htmlType="submit" block>
+              <Button
+                className="mb-3"
+                type="primary"
+                htmlType="submit"
+                block
+                loading={loading}
+              >
                 Register
               </Button>
 
